@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -o pipefail
+set -euo pipefail
 set -o errexit
 
 # Store working directory so script can be run outside of dir.
@@ -46,7 +46,7 @@ do
     n="$(basename "$filename")"
     bn="${n%.*}"
 
-    echo "$filename"
+    echo "On $filename..."
 
 #   HMMER analysis
     nhmmer --cpu $threads --notextw --noali --tblout $output_dir/nhmmer-$bp-vs-$bn-tbl.out -o /dev/null $hmm_profile_name $filename
