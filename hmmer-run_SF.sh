@@ -46,7 +46,14 @@ do
     n="$(basename "$filename")"
     bn="${n%.*}"
 
-    echo "On $filename..."
+    echo "On $filename..." 1>&2
+    final_output_as_sf=$output_dir/AS-SF-vs-$bn.bed
+    final_output_as_strand=$output_dir/AS-strand-vs-$bn.bed
+
+    if [ -f $final_output_as_sf ] && [ -f $final_output_as_strand ]; then
+        echo "Output files exist for $filename. Skipping."  1>&2
+        continue
+    fi
 
 #   HMMER analysis
     nhmmer --cpu $threads --notextw --noali --tblout $output_dir/nhmmer-$bp-vs-$bn-tbl.out -o /dev/null $hmm_profile_name $filename

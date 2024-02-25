@@ -47,7 +47,14 @@ do
     n="$(basename "$filename")"
     bn="${n%.*}"
 
-    echo "On $filename..."
+    echo "On $filename..." 1>&2
+    final_output_as_hor_sf=$output_dir/AS-HOR+SF-vs-$bn.bed
+    final_output_as_hor=$output_dir/AS-HOR-vs-$bn.bed
+
+    if [ -f $final_output_as_hor_sf ] && [ -f $final_output_as_hor ]; then
+        echo "Output files exist for $filename. Skipping."  1>&2
+        continue
+    fi
 
 #   HMMER analysis
     nhmmer --cpu $threads --notextw --noali --tblout $output_dir/nhmmer-$bp-vs-$bn-tbl.out -o /dev/null $hmm_profile_name $filename
@@ -71,10 +78,10 @@ do
     awk "{if(!(\$0 in a)){a[\$0]; print}}" $output_dir/_nhmmer-t1-$bn.bed > $output_dir/_nhmmer-t0-$bn.bed
 
 #   FEDOR: addicional overlap filtering
-    python3 $wd/overlap_filter.py $output_dir/_nhmmer-t0-$bn.bed > $output_dir/AS-HOR+SF-vs-$bn.bed
+    python3 $wd/overlap_filter.py $output_dir/_nhmmer-t0-$bn.bed > $final_output_as_hor_sf
 
 #   FEDOR: AS-HOR only (skip SF monomers)
-    awk '{ if (length($4)==2) {next} print}' $output_dir/AS-HOR+SF-vs-$bn.bed > $output_dir/AS-HOR-vs-$bn.bed
+    awk '{ if (length($4)==2) {next} print}' $output_dir/AS-HOR+SF-vs-$bn.bed > $final_output_as_hor
 
 #   Delete temporary files
     rm $output_dir/_nhmmer-t1-$bn.bed
